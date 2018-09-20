@@ -37,7 +37,16 @@ def NewtonsMethod(P, x, alpha=1.0):
                             tf.expand_dims(Grad,1))# Reshaping to have 2 dimensions
                 ))
     ]
-    
+
+def vector_gradient(y, x):
+    """
+    Take a gradient with more reasonable behavior. 
+    tf.gradients is problematic in its handling of higher rank targets.
+    """
+    yl = tf.unstack(y,axis=1)
+    gl = [ tf.gradients(_,x)[0] for _ in yl ]
+    return tf.stack(gl,axis=-1)
+
 def outer(a,b, triangle=False):
     """
     Symbolic outer product:
