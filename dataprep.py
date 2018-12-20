@@ -1,4 +1,6 @@
+from __future__ import division
 import numpy as np
+import os
 
 def make_datastream(dataset, batchsize=100, buffer_size=1000):
     """
@@ -7,12 +9,48 @@ def make_datastream(dataset, batchsize=100, buffer_size=1000):
     import tensorflow as tf
     repeat_dataset = dataset.repeat()
     shuffled_dataset = repeat_dataset.shuffle(buffer_size=buffer_size)
-    batched_dataset = shuffled_dataset.batch(batchsize)
-    iterator = batched_dataset.make_one_shot_iterator()
+#     batched_dataset = shuffled_dataset.batch(batchsize)
+    iterator = shuffled_dataset.make_one_shot_iterator()
     next_element = iterator.get_next()
-    return tf.stack(next_element)
+    try:
+        stacked = tf.stack(next_element.values())
+    except Attribute as e:
+        stacked = tf.stack(next_element)
+    return stacked
 
+def make_shards(inputfile, outputprefix, entries_per_shards):
+    """
+    Open a dataset and cut it up into more manageable shards. Each
+    shard will be shuffled from the entire dataset.
+    """
+    # Count the file and get the header
+    ndata = 0 # We skip the header
+    with open(inputfile,"r") as f:
+        header = f.readline()[:-1]
+        for l in f:
+            ndata+=1
+    numfiles = ndata//entries_per_shards + 1
 
+    # Load the dataset into memory
+    buffer = np.loadtxt(inputfile,skiprows=1,delimiter=",")
+    # Shuffle the indices
+    idxs = np.array(range(ndata)).astype(np.int32)
+    np.random.shuffle(idxs)
+    # split up the indices
+    remainder = ndata % entries_per_shards
+    location = 0
+    os.system('mkdir -p {0}'.format(outputprefix))
+    for i in range(numfiles):
+        endpoint = location + entries_per_shards + (0 if i < remainder else 1)
+        np.savetxt(outputprefix+'/shard_{0}.csv'.format(i), buffer[location:endpoint,:],
+                   delimiter=", ", header=header, comments="")
+        location = endpoint
+    
+def make_datastream_from_shards(shardprefix, batchsize):
+    """
+    Create a shuffled datastream from the shards.
+    """
+    pass
 
 class Scaler():
     """
