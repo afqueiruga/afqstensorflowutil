@@ -43,6 +43,7 @@ def vector_gradient(y, x):
     Take a gradient with more reasonable behavior. 
     tf.gradients is problematic in its handling of higher rank targets.
     """
+    import tensorflow as tf
     yl = tf.unstack(y,axis=1)
     gl = [ tf.gradients(_,x)[0] for _ in yl ]
     return tf.stack(gl,axis=-1)

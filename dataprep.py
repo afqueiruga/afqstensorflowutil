@@ -2,19 +2,20 @@ from __future__ import division
 import numpy as np
 import os
 
-def make_datastream(dataset, batchsize=100, buffer_size=1000):
+def make_datastream(dataset, batch_size=100, buffer_size=1000):
     """
     Make the dataset iterator you probably want.
     """
     import tensorflow as tf
-    repeat_dataset = dataset.repeat()
-    shuffled_dataset = repeat_dataset.shuffle(buffer_size=buffer_size)
-#     batched_dataset = shuffled_dataset.batch(batchsize)
-    iterator = shuffled_dataset.make_one_shot_iterator()
+    nxt = dataset.repeat()
+    nxt = nxt.shuffle(buffer_size=buffer_size)
+    if batch_size > 0:
+        nxt = nxt.batch(batch_size)
+    iterator = nxt.make_one_shot_iterator()
     next_element = iterator.get_next()
     try:
         stacked = tf.stack(next_element.values())
-    except Attribute as e:
+    except AttributeError as e:
         stacked = tf.stack(next_element)
     return stacked
 
