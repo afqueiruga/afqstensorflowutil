@@ -46,7 +46,7 @@ def vector_gradient(y, x):
     import tensorflow as tf
     yl = tf.unstack(y,axis=1)
     gl = [ tf.gradients(_,x)[0] for _ in yl ]
-    return tf.stack(gl,axis=-1)
+    return tf.transpose(tf.stack(gl,axis=-1),perm=[0,2,1])
 
 def outer(a,b, triangle=False):
     """
