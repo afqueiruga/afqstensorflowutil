@@ -3,6 +3,10 @@ import numpy as np
 from . import Scaler
 from .dataprep import make_shards
 
+"""
+A script to normalize and shuffle a csv file.
+"""
+
 parser = argparse.ArgumentParser(description='Scale a csv and shuffle into shards.')
 parser.add_argument('file', metavar='file', type=str,
         help='file to scale')

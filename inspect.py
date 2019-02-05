@@ -1,5 +1,8 @@
 import tensorflow as tf
 
+"""
+Tools for examining and altering graphs.
+"""
 
 def travel_op(op,indents=0):
     "Print a tree from a tensorflow op"
