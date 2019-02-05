@@ -1,8 +1,11 @@
 import numpy as np
 import itertools
+import tensorflow as tf
 
 def CatVariable(shapes, stddev=0.0):
-    import tensorflow as tf
+    """Makes one stacked variable and gives you subslices. Useful for 
+    building the gradients and hessians needed for second-order methods,
+    so that you get the cross-terms between weights."""
     l = 0
     for shp in shapes:
         il = 1
@@ -23,7 +26,6 @@ def NewtonsMethod(P, x, alpha=1.0):
     """
     Gives you an operator that performs standard Newton's method
     """
-    import tensorflow as tf
     if len(x.shape)!=1:
         Exception('')
     N = x.shape[0]
@@ -43,7 +45,6 @@ def vector_gradient(y, x):
     Take a gradient with more reasonable behavior. 
     tf.gradients is problematic in its handling of higher rank targets.
     """
-    import tensorflow as tf
     yl = tf.unstack(y,axis=1)
     gl = [ tf.gradients(_,x)[0] for _ in yl ]
     return tf.transpose(tf.stack(gl,axis=-1),perm=[0,2,1])
@@ -56,7 +57,6 @@ def outer(a,b, triangle=False):
     only return the lower triangle because it's identical to the upper triangle)
     You probably want triangle=True when a==b.
     """
-    import tensorflow as tf
     p = []
     for i in xrange(a.shape[-1]):
         for j in xrange(i if triangle else 0,b.shape[-1]):
@@ -69,7 +69,6 @@ def polyexpand(a,o):
     all cross terms. E.g.,
     polyexpand([x y], 2) = [ x y x^2 xy y^2 ]
     """
-    import tensorflow as tf
     if o<=0: raise Exception("I don't know what it means when o<=0")
     if o==1: return a
     p = [a,outer(a,a,True)]
@@ -85,7 +84,7 @@ def polyexpand(a,o):
     return tf.concat(p, axis=1)
 
 def Npolyexpand(dim,o):
-    " Returns the length of polyexpand to preallocate data"
+    """Returns the length of polyexpand to preallocate data."""
     from math import factorial as fac
     choose = lambda n,k : fac(n) / (fac(k)*fac(n-k))
     return sum([ choose( dim+i-1, dim-1 ) for i in range(1,o+1) ])
