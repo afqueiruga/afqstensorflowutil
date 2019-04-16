@@ -53,8 +53,7 @@ def make_datastream_from_shards(shardprefix, batchsize):
     """
     pass
 
-
-def Divy(data, xslice, yslice, rtest, rvalid=0):
+def divy(data, xslice, yslice, rtest, rvalid=0):
     """
     Divy data up into groups for training. Only works on numpy.
     """
@@ -75,16 +74,18 @@ def Divy(data, xslice, yslice, rtest, rvalid=0):
     train_x = data[trainIdxs,xslice]
     test_x  = data[testIdxs, xslice]
     valid_x = data[validIdxs,xslice]
-    train_y = data[trainIdxs,yslice]
-    test_y  = data[testIdxs, yslice]
-    valid_y = data[validIdxs,yslice]
     if len(train_x.shape)<2:
         train_x = train_x.reshape(train_x.size,1)
         test_x = test_x.reshape(test_x.size,1)
         valid_x = valid_x.reshape(valid_x.size,1)
-    if len(train_y.shape)<2:
-        train_y = train_y.reshape(train_y.size,1)
-        test_y = test_y.reshape(test_y.size,1)
-        valid_y = valid_y.reshape(valid_y.size,1)
-        
-    return train_x,train_y, test_x,test_y, valid_x,valid_y
+    if not yslice is None:
+        train_y = data[trainIdxs,yslice]
+        test_y  = data[testIdxs, yslice]
+        valid_y = data[validIdxs,yslice]
+        if len(train_y.shape)<2:
+            train_y = train_y.reshape(train_y.size,1)
+            test_y = test_y.reshape(test_y.size,1)
+            valid_y = valid_y.reshape(valid_y.size,1)
+        return train_x,train_y, test_x,test_y, valid_x,valid_y
+    else:
+        return train_x, test_x, valid_x
