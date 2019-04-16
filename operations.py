@@ -22,6 +22,14 @@ def CatVariable(shapes, stddev=0.0):
         l += il
     return V, cuts
 
+def shape_to_size(Y):
+    """Calculate the total size of the tensor my multiplying the shapes"""
+    return int(reduce(lambda a,b:a*b,Y.shape))
+
+def flatpack(Y):
+    """Pack a list of tensors"""
+    return tf.concat([tf.reshape(y, (-1,)) for y in Y],axis=-1)
+
 
 def vector_gradient(y, x):
     """
@@ -61,7 +69,7 @@ def NewtonsMethod(P, x, alpha=1.0):
     ]
 
 
-def NewtonsMethod2(P, x, alpha=1.0):
+def NewtonsMethod2_single_tensor(P, x, alpha=1.0):
     """
     Gives you an operator that performs standard Newton's method
     """
@@ -79,7 +87,37 @@ def NewtonsMethod2(P, x, alpha=1.0):
     ]
     return ops
     
+def NewtonsMethod2(P, x, alpha=1.0):
+    """
+    Gives you an operator that performs standard Newton's method
+    """
+    try: # is a single entry
+        N = shape_to_size(x)
+        x = [x]
+    except AttributeError: # is a list
+        N = sum([shape_to_size(_x) for _x in x])
+    packed_ranges = []
+    ptr = 0
+    for y in x:
+        packed_ranges.append( (ptr, ptr+shape_to_size(y)) )
+        ptr += shape_to_size(y)
+    print(packed_ranges)
+    assert ptr==N
 
+    Grad = tf.gradients(P,x)
+    Grad_flat = flatpack(Grad)
+    hs = [ flatpack(tf.gradients(_,x)) for _ in tf.unstack(Grad_flat) ]
+    Hess = tf.stack([tf.reshape(h,(-1,)) for h in hs])
+    # TensorFlow f's up the shapes a lot, so I'm constantly reshaping
+    delta = tf.matrix_solve(Hess, tf.expand_dims(Grad_flat,1))
+#     delta_reshaped = tf.reshape(delta, x.shape)
+    print(delta.shape)
+    delta_split = [ tf.slice(delta, (beg,0),(end-beg,1)) for beg,end in packed_ranges ]
+    ops = [
+        y.assign_add(-alpha*tf.reshape(delta_y,y.shape))
+        for delta_y,y in zip(delta_split,x)
+    ]
+    return ops
 
 def outer(a,b, triangle=False):
     """
