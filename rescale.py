@@ -29,15 +29,15 @@ train,test,valid = divy(S.scaled_data, slice(0,4),None, 1.0/6.0,1.0/6.0)
 
 
 if args.binary:
-    np.savez(path+"train_"+fname+"_scaled", train)
-    np.savez(path+"test_"+fname+"_scaled", test)
-    np.savez(path+"valid_"+fname+"_scaled", valid)
+    np.save(path+fname+"_scaled_train", train)
+    np.save(path+fname+"_scaled_test" , test )
+    np.save(path+fname+"_scaled_valid", valid)
 else:
-    np.savetxt(path+"train_"+fname+"_scaled"+ext, train,
+    np.savetxt(path+fname+"_scaled_train"+ext, train,
             delimiter=",",header=header,comments="")
-    np.savetxt(path+"test_"+fname+"_scaled"+ext, test,
+    np.savetxt(path+fname+"_scaled_test"+ext, test,
             delimiter=",",header=header,comments="")
-    np.savetxt(path+"valid_"+fname+"_scaled"+ext, valid,
+    np.savetxt(path+fname+"_scaled_valid"+ext, valid,
             delimiter=",",header=header,comments="")
     
 np.savetxt(fname+"_ranges"+ext,np.array(S.scale).T,
