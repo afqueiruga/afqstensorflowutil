@@ -31,7 +31,7 @@ def flatpack(Y):
     return tf.concat([tf.reshape(y, (-1,)) for y in Y],axis=-1)
 
 
-def vector_gradient(y, x):
+def vector_gradient_dep(y, x):
     """
     Take a gradient with more reasonable behavior. 
     tf.gradients is problematic in its handling of higher rank targets.
@@ -40,7 +40,7 @@ def vector_gradient(y, x):
     gl = [ tf.gradients(_,x)[0] for _ in yl ]
     return tf.transpose(tf.stack(gl,axis=-1),perm=[0,2,1])
 
-def vector_gradient2(y, x):
+def vector_gradient(y, x):
     """
     Take a gradient with more reasonable behavior. 
     tf.gradients is problematic in its handling of higher rank targets.
@@ -50,9 +50,9 @@ def vector_gradient2(y, x):
     return tf.stack([tf.reshape(g,(-1,)) for g in gs])
 
 
-def NewtonsMethod(P, x, alpha=1.0):
+def NewtonsMethod_dep(P, x, alpha=1.0):
     """
-    Gives you an operator that performs standard Newton's method
+    Deprecated:Gives you an operator that performs standard Newton's method
     """
     if len(x.shape)!=1:
         raise Exception('')
@@ -71,7 +71,8 @@ def NewtonsMethod(P, x, alpha=1.0):
 
 def NewtonsMethod2_single_tensor(P, x, alpha=1.0):
     """
-    Gives you an operator that performs standard Newton's method
+    Gives you an operator that performs standard Newton's method.
+    Only operates on one tensor.
     """
     N = x.shape[0]
     
@@ -87,7 +88,7 @@ def NewtonsMethod2_single_tensor(P, x, alpha=1.0):
     ]
     return ops
     
-def NewtonsMethod2(P, x, alpha=1.0):
+def NewtonsMethod(P, x, alpha=1.0):
     """
     Gives you an operator that performs standard Newton's method
     """
