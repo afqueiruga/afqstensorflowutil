@@ -14,7 +14,7 @@ def make_datastream(dataset, batch_size=100, buffer_size=1000):
     iterator = nxt.make_one_shot_iterator()
     next_element = iterator.get_next()
     try:
-        stacked = tf.stack(next_element.values())
+        stacked = tf.stack( list(next_element.values()) )
     except AttributeError as e:
         stacked = tf.stack(next_element)
     return stacked

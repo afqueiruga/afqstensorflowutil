@@ -1,6 +1,7 @@
 import numpy as np
 import itertools
 import tensorflow as tf
+from functools import reduce
 
 def CatVariable(shapes, stddev=0.0):
     """Makes one stacked variable and gives you subslices. Useful for 
@@ -129,8 +130,8 @@ def outer(a,b, triangle=False):
     You probably want triangle=True when a==b.
     """
     p = []
-    for i in xrange(a.shape[-1]):
-        for j in xrange(i if triangle else 0,b.shape[-1]):
+    for i in range(a.shape[-1]):
+        for j in range(i if triangle else 0,b.shape[-1]):
             p.append( a[:,i]*b[:,j] )
     return tf.stack(p, axis=-1)
 
@@ -143,7 +144,7 @@ def polyexpand(a,o):
     if o<=0: raise Exception("I don't know what it means when o<=0")
     if o==1: return a
     p = [a,outer(a,a,True)]
-    for i in xrange(3,o+1):
+    for i in range(3,o+1):
         exponents = itertools.combinations_with_replacement(range(a.shape[-1]),i)
         multinom = []        
         for m in exponents:
@@ -158,4 +159,4 @@ def Npolyexpand(dim,o):
     """Returns the length of polyexpand to preallocate data."""
     from math import factorial as fac
     choose = lambda n,k : fac(n) / (fac(k)*fac(n-k))
-    return sum([ choose( dim+i-1, dim-1 ) for i in range(1,o+1) ])
+    return int(sum([ choose( dim+i-1, dim-1 ) for i in range(1,o+1) ]))
