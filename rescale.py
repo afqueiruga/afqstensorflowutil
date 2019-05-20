@@ -26,8 +26,6 @@ S = Scaler(dat)
 
 train,test,valid = divy(S.scaled_data, slice(0,4),None, 1.0/6.0,1.0/6.0)
 
-
-
 if args.binary:
     np.save(path+fname+"_scaled_train", train)
     np.save(path+fname+"_scaled_test" , test )
@@ -40,7 +38,7 @@ else:
     np.savetxt(path+fname+"_scaled_valid"+ext, valid,
             delimiter=",",header=header,comments="")
     
-np.savetxt(fname+"_ranges"+ext,np.array(S.scale).T,
+np.savetxt(path+fname+"_ranges"+ext,np.array(S.scale).T,
            delimiter=",",header=header,comments="")
 
 
