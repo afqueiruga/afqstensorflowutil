@@ -89,7 +89,7 @@ def NewtonsMethod2_single_tensor(P, x, alpha=1.0):
     ]
     return ops
     
-def NewtonsMethod(P, x, alpha=1.0):
+def NewtonsMethod_pieces(P,x,alpha=1.0):
     """
     Gives you an operator that performs standard Newton's method
     """
@@ -115,11 +115,19 @@ def NewtonsMethod(P, x, alpha=1.0):
 #     delta_reshaped = tf.reshape(delta, x.shape)
     print(delta.shape)
     delta_split = [ tf.slice(delta, (beg,0),(end-beg,1)) for beg,end in packed_ranges ]
-    ops = [
+    step_ops = [
         y.assign_add(-alpha*tf.reshape(delta_y,y.shape))
         for delta_y,y in zip(delta_split,x)
     ]
-    return ops
+    i_delta_y = tf.placeholder(name='i_delta_W', shape=delta.shape, dtype=delta.dtype )
+    delta_assign_ops = [
+        y.assign_add(-alpha*tf.reshape(i_delta_y,y.shape))
+        for delta_y,y in zip(delta_split,x)
+    ]
+    return step_ops,Grad_flat,Hess,delta,delta_split, i_delta_y,delta_assign_ops,
+
+def NewtonsMethod(P, x, alpha=1.0):
+    return NewtonsMethod_pieces(P,x,alpha=alpha)[0]
 
 def outer(a,b, triangle=False):
     """
