@@ -7,8 +7,8 @@ Tools for examining and altering graphs.
 def travel_op(op,indents=0):
     "Print a tree from a tensorflow op"
     # TODO: Detect op or tensor
-    for _ in xrange(indents): print " ",
-    print op.name, " : ", op.type
+    for _ in range(indents): print(" ")
+    print(op.name, " : ", op.type)
     for i in op.inputs:
         travel_op(i.op,indents+2)
         

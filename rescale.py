@@ -21,7 +21,9 @@ path+='/'
 with file(path+fname+ext) as f:
     header = f.readline()[:-1]
 dat = np.loadtxt(path+fname+ext,skiprows=1,delimiter=",")
-    
+
+# TODO: Log(p) it here, and write a note in the scale file?
+
 S = Scaler(dat)
 
 train,test,valid = divy(S.scaled_data, slice(0,4),None, 1.0/6.0,1.0/6.0)
