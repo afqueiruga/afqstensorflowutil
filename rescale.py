@@ -18,7 +18,7 @@ args = parser.parse_args()
 fname, ext = os.path.splitext(args.file)
 path,fname = os.path.split(fname)
 path+='/'
-with file(path+fname+ext) as f:
+with open(path+fname+ext,'r') as f:
     header = f.readline()[:-1]
 dat = np.loadtxt(path+fname+ext,skiprows=1,delimiter=",")
 
